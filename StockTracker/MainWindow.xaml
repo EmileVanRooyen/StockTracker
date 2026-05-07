@@ -80,6 +80,9 @@
             <TabItem Header="Labour Calculation">
                 <views:LabourCalculation/>
             </TabItem>
+            <TabItem Header="EOQ Calculation">
+                <views:EOQCalculator/>
+            </TabItem>
 
             <!-- Add more tabs here as needed -->
         </TabControl>
