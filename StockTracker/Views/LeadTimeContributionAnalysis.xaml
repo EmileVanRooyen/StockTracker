@@ -1,0 +1,78 @@
+﻿<UserControl x:Class="StockTracker.Views.LeadTimeContributionAnalysis"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:StockTracker.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Lead Time Contribution Analysis" FontSize="24" FontWeight="Bold" Margin="0,0,0,20"/>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
+            <Button Content="Add Row" Click="AddRow_Click" Padding="10,5" Margin="0,0,10,0"/>
+            <Button Content="Remove Selected" Click="RemoveRow_Click" Padding="10,5"/>
+        </StackPanel>
+
+        <DataGrid Grid.Row="2" 
+                  x:Name="LeadTimeDataGrid"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False"
+                  SelectionMode="Single"
+                  SelectionChanged="LeadTimeDataGrid_SelectionChanged">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Maximum Lead Time (weeks)" Binding="{Binding MaximumLeadTime, UpdateSourceTrigger=PropertyChanged, StringFormat=N1}" Width="*"/>
+                <DataGridTextColumn Header="Maximum Usage (units per weekly)" Binding="{Binding MaximumUsage, UpdateSourceTrigger=PropertyChanged, StringFormat=N0}" Width="*"/>
+                <DataGridTextColumn Header="Minimum Lead Time (weeks)" Binding="{Binding MinimumLeadTime, UpdateSourceTrigger=PropertyChanged, StringFormat=N1}" Width="*"/>
+                <DataGridTextColumn Header="Minimum Usage (units per weekly)" Binding="{Binding MinimumUsage, UpdateSourceTrigger=PropertyChanged, StringFormat=N0}" Width="*"/>
+                <DataGridTextColumn Header="Average Lead Time (weeks)" Binding="{Binding AverageLeadTime, UpdateSourceTrigger=PropertyChanged, StringFormat=N1}" Width="*"/>
+                <DataGridTextColumn Header="Average Usage (units per week)" Binding="{Binding AverageUsage, UpdateSourceTrigger=PropertyChanged, StringFormat=N0}" Width="*"/>
+                <DataGridTextColumn Header="Safety Stock (units)" Binding="{Binding SafetyStock, UpdateSourceTrigger=PropertyChanged, StringFormat=N0}" Width="*"/>
+                <DataGridTextColumn Header="Reorder Point" Binding="{Binding ReorderPoint, UpdateSourceTrigger=PropertyChanged, StringFormat=N0}" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Center">
+            <Button Content="Calculate Missing Fields" Click="Calculate_Click" Padding="15,8" FontWeight="SemiBold" FontSize="14"/>
+        </StackPanel>
+
+        <Separator Grid.Row="4" Margin="0,20,0,10"/>
+
+        <Grid Grid.Row="5" x:Name="CalculationDetailsPanel" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Text="Calculation Details for Selected Row" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,10"/>
+
+            <DataGrid Grid.Row="1" 
+                      x:Name="CalculationDetailsGrid"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      HeadersVisibility="Column"
+                      GridLinesVisibility="All"
+                      RowBackground="White"
+                      AlternatingRowBackground="#F5F5F5">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Field" Binding="{Binding Field}" Width="2*" FontWeight="SemiBold"/>
+                    <DataGridTextColumn Header="Formula" Binding="{Binding Formula}" Width="3*"/>
+                    <DataGridTextColumn Header="Substituted Values" Binding="{Binding SubstitutedValues}" Width="3*"/>
+                    <DataGridTextColumn Header="Result" Binding="{Binding Result}" Width="2*" FontWeight="Bold"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </Grid>
+</UserControl>
