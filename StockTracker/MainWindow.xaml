@@ -74,6 +74,12 @@
             <TabItem Header="📈 Lead Time Analysis">
                 <views:LeadTimeContributionAnalysis/>
             </TabItem>
+            <TabItem Header="VAT Calculation">
+                <views:VATCalculation/>
+            </TabItem>
+            <TabItem Header="Labour Calculation">
+                <views:LabourCalculation/>
+            </TabItem>
 
             <!-- Add more tabs here as needed -->
         </TabControl>

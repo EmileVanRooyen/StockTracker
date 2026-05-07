@@ -1,0 +1,431 @@
+﻿<UserControl x:Class="StockTracker.Views.VATCalculation"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:StockTracker.Views"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d" 
+             d:DesignHeight="700" d:DesignWidth="1400">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="VAT Calculation Table" FontSize="24" FontWeight="Bold" Margin="0,0,0,10"/>
+        <TextBlock Grid.Row="1" Text="Bulk Butcher (Pty) Ltd - VAT Analysis" FontSize="14" Foreground="#555" Margin="0,0,0,10"/>
+
+        <!-- VAT Rules Panel -->
+        <Expander Grid.Row="2" Header="📚 VAT Rules to Remember" IsExpanded="False" Margin="0,0,0,10" 
+                  Background="#FFF8E1" BorderBrush="#FFA726" BorderThickness="2">
+            <Border Padding="15" Background="#FFFEF5">
+                <ScrollViewer MaxHeight="250" VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock FontWeight="Bold" FontSize="14" Foreground="#E65100" Margin="0,0,0,10">
+                            Important VAT Compliance Rules
+                        </TextBlock>
+
+                        <TextBlock TextWrapping="Wrap" Margin="0,0,0,8">
+                            <Bold>1. Check Vendor Registration</Bold>
+                            <LineBreak/>
+                            If the supplier is <Bold>not a VAT vendor</Bold> → no VAT applies. Uncheck "VAT Applicable".
+                            <LineBreak/>
+                            <Italic>Example: Farmer John (not registered) → Input VAT = 0.</Italic>
+                        </TextBlock>
+
+                        <TextBlock TextWrapping="Wrap" Margin="0,0,0,8">
+                            <Bold>2. Salaries and Wages</Bold>
+                            <LineBreak/>
+                            Salaries/wages are <Bold>not subject to VAT</Bold>. Never calculate VAT on payroll expenses.
+                            <LineBreak/>
+                            <Italic>Input VAT = 0. Uncheck "VAT Applicable".</Italic>
+                        </TextBlock>
+
+                        <TextBlock TextWrapping="Wrap" Margin="0,0,0,8">
+                            <Bold>3. Rental of Commercial Premises</Bold>
+                            <LineBreak/>
+                            If the landlord is a VAT vendor → VAT applies at 15%. Input VAT can be claimed.
+                            <LineBreak/>
+                            <Italic>Formula: Rent excl. VAT × 15% = Input VAT.</Italic>
+                        </TextBlock>
+
+                        <TextBlock TextWrapping="Wrap" Margin="0,0,0,8">
+                            <Bold>4. Sales and Revenue</Bold>
+                            <LineBreak/>
+                            If your business is a VAT vendor → all taxable sales are VAT-inclusive.
+                            <LineBreak/>
+                            <Italic>Output VAT = Sales excl. VAT × 15%. Always recorded as Payable to SARS.</Italic>
+                        </TextBlock>
+
+                        <TextBlock TextWrapping="Wrap" Margin="0,0,0,8">
+                            <Bold>5. Closing Stock/Inventory</Bold>
+                            <LineBreak/>
+                            Stock balances <Bold>do not affect VAT directly</Bold>. VAT is based on transactions (purchases/sales), not inventory remaining.
+                        </TextBlock>
+
+                        <TextBlock TextWrapping="Wrap" Margin="0,0,0,8">
+                            <Bold>6. Zero-Rated vs. Exempt Supplies</Bold>
+                            <LineBreak/>
+                            <Bold>Zero-rated</Bold> (0% VAT): Exports, basic foodstuffs - you can claim input VAT.
+                            <LineBreak/>
+                            <Bold>Exempt</Bold>: Financial services, residential rent - you cannot claim input VAT.
+                        </TextBlock>
+
+                        <TextBlock TextWrapping="Wrap" Margin="0,0,0,8">
+                            <Bold>7. Mixed-Use Assets (Private Use)</Bold>
+                            <LineBreak/>
+                            If an asset is used for both business and personal purposes, only claim VAT on the business portion.
+                            <LineBreak/>
+                            <Italic>Example: 70% business use → claim 70% of input VAT.</Italic>
+                        </TextBlock>
+
+                        <TextBlock TextWrapping="Wrap" Margin="0,0,0,8">
+                            <Bold>8. Entertainment Expenses</Bold>
+                            <LineBreak/>
+                            VAT on entertainment (meals, events) is generally <Bold>not claimable</Bold> unless for staff on business travel.
+                        </TextBlock>
+
+                        <TextBlock TextWrapping="Wrap" Margin="0,0,0,8">
+                            <Bold>9. Net VAT Calculation</Bold>
+                            <LineBreak/>
+                            <Bold>Net VAT = Output VAT - Input VAT</Bold>
+                            <LineBreak/>
+                            • If positive → <Bold>Payable to SARS</Bold>
+                            <LineBreak/>
+                            • If negative → <Bold>Receivable from SARS</Bold>
+                        </TextBlock>
+
+                        <TextBlock TextWrapping="Wrap" Margin="0,0,0,8">
+                            <Bold>10. VAT Invoices - Documentary Requirements</Bold>
+                            <LineBreak/>
+                            You can only claim input VAT if you have a <Bold>valid tax invoice</Bold>:
+                            <LineBreak/>
+                            • Supplier's VAT number
+                            <LineBreak/>
+                            • VAT amount shown separately
+                            <LineBreak/>
+                            • Date, description, and amounts
+                        </TextBlock>
+
+                        <TextBlock TextWrapping="Wrap" Margin="0,0,0,8" Foreground="#C62828">
+                            <Bold>⚠️ Golden Rule</Bold>
+                            <LineBreak/>
+                            Never assume VAT applies just because money is spent.
+                            <LineBreak/>
+                            <Bold>Always ask:</Bold> Is the supplier a VAT vendor? Is the transaction VAT-able? Do I have a proper tax invoice?
+                        </TextBlock>
+
+                        <TextBlock TextWrapping="Wrap" Margin="0,8,0,0" FontStyle="Italic" Foreground="#424242" FontSize="11">
+                            Note: These are general guidelines for South African VAT (15% standard rate as of 2024). 
+                            Always consult with a tax professional for specific situations and ensure compliance with the latest SARS regulations.
+                        </TextBlock>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Expander>
+
+        <!-- Instructions Panel -->
+        <Border Grid.Row="3" Background="#E8F4F8" BorderBrush="#3498DB" BorderThickness="1" Padding="10" Margin="0,0,0,10">
+            <StackPanel>
+                <TextBlock FontWeight="SemiBold" Foreground="#2C3E50" Margin="0,0,0,5">
+                    <Run Text="📋 Instructions:"/>
+                </TextBlock>
+                <TextBlock TextWrapping="Wrap" Foreground="#34495E">
+                    1. Click <Bold>"Load Example"</Bold> to see Bulk Butcher (Pty) Ltd scenario or "Add Transaction" to start fresh
+                    <LineBreak/>
+                    2. Enter Description and select Transaction Type from dropdown (Payable/Receivable)
+                    <LineBreak/>
+                    3. Check or uncheck <Bold>"VAT Applicable"</Bold> - if unchecked, no VAT will be calculated (use for salaries, non-VAT vendors, etc.)
+                    <LineBreak/>
+                    4. Enter EITHER "Amount (Incl VAT)" OR "Amount (Excl VAT)" - the other will be calculated automatically
+                    <LineBreak/>
+                    5. Adjust VAT Rate if needed (default 15%) - only applies if VAT Applicable is checked
+                    <LineBreak/>
+                    6. Click "Calculate VAT" to compute all VAT amounts and determine final Payable/Receivable status
+                </TextBlock>
+            </StackPanel>
+        </Border>
+
+        <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="0,0,0,10">
+            <Button Content="Load Example" Click="LoadExample_Click" Padding="10,5" Margin="0,0,10,0" 
+                    Background="#4CAF50" Foreground="White" FontWeight="SemiBold"/>
+            <Button Content="Add Transaction" Click="AddRow_Click" Padding="10,5" Margin="0,0,10,0"/>
+            <Button Content="Remove Selected" Click="RemoveRow_Click" Padding="10,5" Margin="0,0,10,0"/>
+            <Button Content="Clear All" Click="ClearAll_Click" Padding="10,5" Margin="0,0,10,0" 
+                    Background="#F44336" Foreground="White"/>
+            <Button Content="Calculate VAT" Click="Calculate_Click" Padding="15,5" FontWeight="SemiBold" 
+                    Background="#3498DB" Foreground="White" Margin="10,0,0,0"/>
+        </StackPanel>
+
+        <DataGrid Grid.Row="5" 
+                  x:Name="VATDataGrid"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False"
+                  SelectionMode="Single"
+                  SelectionChanged="VATDataGrid_SelectionChanged"
+                  GridLinesVisibility="All"
+                  RowBackground="White"
+                  AlternatingRowBackground="#F9F9F9"
+                  VirtualizingPanel.IsVirtualizing="True"
+                  VirtualizingPanel.VirtualizationMode="Recycling">
+            <DataGrid.Columns>
+                <!-- User Input Columns -->
+                <DataGridTextColumn Header="Description" Binding="{Binding Description, UpdateSourceTrigger=LostFocus}" Width="2*">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#FFFFFF"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="Padding" Value="5"/>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                </DataGridTextColumn>
+
+                <DataGridComboBoxColumn Header="Transaction Type" 
+                                        SelectedItemBinding="{Binding TransactionType, UpdateSourceTrigger=PropertyChanged}" 
+                                        Width="1.2*">
+                    <DataGridComboBoxColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#E1BEE7"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="Padding" Value="5"/>
+                        </Style>
+                    </DataGridComboBoxColumn.HeaderStyle>
+                    <DataGridComboBoxColumn.ElementStyle>
+                        <Style TargetType="ComboBox">
+                            <Setter Property="Background" Value="#F3E5F5"/>
+                            <Setter Property="ItemsSource">
+                                <Setter.Value>
+                                    <x:Array Type="sys:String">
+                                        <sys:String>Payable</sys:String>
+                                        <sys:String>Receivable</sys:String>
+                                    </x:Array>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGridComboBoxColumn.ElementStyle>
+                    <DataGridComboBoxColumn.EditingElementStyle>
+                        <Style TargetType="ComboBox">
+                            <Setter Property="Background" Value="#F3E5F5"/>
+                            <Setter Property="ItemsSource">
+                                <Setter.Value>
+                                    <x:Array Type="sys:String">
+                                        <sys:String>Payable</sys:String>
+                                        <sys:String>Receivable</sys:String>
+                                    </x:Array>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGridComboBoxColumn.EditingElementStyle>
+                </DataGridComboBoxColumn>
+
+                <DataGridCheckBoxColumn Header="VAT Applicable" Binding="{Binding IsVATApplicable, UpdateSourceTrigger=PropertyChanged}" Width="1*">
+                    <DataGridCheckBoxColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#FFE0B2"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="Padding" Value="5"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                        </Style>
+                    </DataGridCheckBoxColumn.HeaderStyle>
+                    <DataGridCheckBoxColumn.ElementStyle>
+                        <Style TargetType="CheckBox">
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                        </Style>
+                    </DataGridCheckBoxColumn.ElementStyle>
+                </DataGridCheckBoxColumn>
+
+                <DataGridTextColumn Header="Amount (Incl VAT)" Binding="{Binding AmountInclVAT, UpdateSourceTrigger=LostFocus, StringFormat=N2}" Width="1.2*">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#FFF9C4"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="Padding" Value="5"/>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Background" Value="#FFF9C4"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="VAT Rate %" Binding="{Binding VATRate, UpdateSourceTrigger=LostFocus, StringFormat=N2}" Width="0.8*">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#FFFACD"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="Padding" Value="5"/>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Background" Value="#FFFACD"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="Amount (Excl VAT)" Binding="{Binding AmountExclVAT, UpdateSourceTrigger=LostFocus, StringFormat=N2}" Width="1.2*">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#E1F5FE"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="Padding" Value="5"/>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Background" Value="#E1F5FE"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <!-- Calculated Columns -->
+                <DataGridTextColumn Header="VAT Amount" Binding="{Binding VATAmount, StringFormat=N2}" Width="1*" IsReadOnly="True">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#F0F4C3"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="Padding" Value="5"/>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Background" Value="#F0F4C3"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="Input VAT" Binding="{Binding InputVAT, StringFormat=N2}" Width="1*" IsReadOnly="True">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#E8F5E9"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="Padding" Value="5"/>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Background" Value="#E8F5E9"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="Output VAT" Binding="{Binding OutputVAT, StringFormat=N2}" Width="1*" IsReadOnly="True">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#FFF3E0"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="Padding" Value="5"/>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Background" Value="#FFF3E0"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="NET VAT AMOUNT" Binding="{Binding NetVATAmount, StringFormat=N2}" Width="1.2*" IsReadOnly="True">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#E3F2FD"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="Padding" Value="5"/>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Background" Value="#E3F2FD"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="PAYABLE TO SARS / RECEIVABLE FROM SARS" Binding="{Binding VATStatus}" Width="2*" IsReadOnly="True">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#FCE4EC"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="Padding" Value="5"/>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Background" Value="#FCE4EC"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Separator Grid.Row="6" Margin="0,20,0,10"/>
+
+        <Grid Grid.Row="7">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" BorderBrush="#BDC3C7" BorderThickness="2" Padding="15" Margin="0,0,10,0" Background="#FAFAFA">
+                <StackPanel>
+                    <TextBlock Text="VAT Summary" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Total Input VAT:" FontWeight="SemiBold" Margin="0,5"/>
+                        <TextBlock Grid.Row="0" Grid.Column="1" x:Name="TotalInputVATText" Text="R 0.00" HorizontalAlignment="Right" Margin="0,5" Foreground="#27AE60" FontSize="14"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Total Output VAT:" FontWeight="SemiBold" Margin="0,5"/>
+                        <TextBlock Grid.Row="1" Grid.Column="1" x:Name="TotalOutputVATText" Text="R 0.00" HorizontalAlignment="Right" Margin="0,5" Foreground="#E67E22" FontSize="14"/>
+
+                        <Separator Grid.Row="2" Grid.ColumnSpan="2" Margin="0,10"/>
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Net VAT Position:" FontWeight="Bold" FontSize="16" Margin="0,5"/>
+                        <TextBlock Grid.Row="3" Grid.Column="1" x:Name="NetVATPositionText" Text="R 0.00" HorizontalAlignment="Right" Margin="0,5" FontWeight="Bold" FontSize="16" Foreground="#2C3E50"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="1" BorderBrush="#BDC3C7" BorderThickness="2" Padding="15" Margin="10,0,0,0" Background="#FAFAFA" x:Name="CalculationDetailsPanel" Visibility="Collapsed">
+                <StackPanel>
+                    <TextBlock Text="Transaction Details" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
+                    <ScrollViewer MaxHeight="250" VerticalScrollBarVisibility="Auto">
+                        <DataGrid x:Name="CalculationDetailsGrid"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="True"
+                                  CanUserAddRows="False"
+                                  CanUserDeleteRows="False"
+                                  HeadersVisibility="Column"
+                                  GridLinesVisibility="All"
+                                  RowBackground="White"
+                                  AlternatingRowBackground="#F5F5F5">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Field" Binding="{Binding Field}" Width="*" FontWeight="SemiBold"/>
+                                <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="1.5*" FontWeight="Bold"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </ScrollViewer>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>
