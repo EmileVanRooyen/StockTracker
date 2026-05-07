@@ -1,0 +1,285 @@
+﻿<UserControl x:Class="StockTracker.Views.MarkUpCalculation"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:StockTracker.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="1400">
+    <UserControl.Resources>
+        <!-- Style for calculated fields with highlight -->
+        <Style x:Key="CalculatedCellStyle" TargetType="DataGridCell">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsCalculated}" Value="True">
+                    <Setter Property="Background" Value="#E8F5E9"/>
+                    <Setter Property="BorderBrush" Value="#66BB6A"/>
+                    <Setter Property="BorderThickness" Value="1"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Title -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="Mark Up Calculation" FontSize="24" FontWeight="Bold" Foreground="#1976D2"/>
+            <TextBlock Text="Calculate cost price, mark up, selling price, and VAT. Enter any available fields and click Calculate to fill in the rest." 
+                       FontSize="12" Foreground="#555" Margin="0,5,0,0" TextWrapping="Wrap"/>
+        </StackPanel>
+
+        <!-- Action Buttons -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
+            <Button Content="Add Row" Click="AddRow_Click" Padding="10,5" Margin="0,0,10,0" 
+                    Background="#1976D2" Foreground="White" FontWeight="SemiBold" BorderThickness="0" Cursor="Hand">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="#1976D2"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#1565C0"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <Button Content="Remove Selected" Click="RemoveRow_Click" Padding="10,5" Margin="0,0,10,0"
+                    Background="#D32F2F" Foreground="White" FontWeight="SemiBold" BorderThickness="0" Cursor="Hand">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="#D32F2F"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#C62828"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <Button Content="Calculate" Click="Calculate_Click" Padding="10,5" 
+                    Background="#388E3C" Foreground="White" FontWeight="SemiBold" BorderThickness="0" Cursor="Hand">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="#388E3C"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#2E7D32"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </StackPanel>
+
+        <!-- Data Grid -->
+        <DataGrid Grid.Row="2" 
+                  x:Name="MarkUpDataGrid"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False"
+                  SelectionMode="Single"
+                  GridLinesVisibility="All"
+                  RowBackground="White"
+                  AlternatingRowBackground="#F5F5F5"
+                  HeadersVisibility="All"
+                  CanUserReorderColumns="False"
+                  CanUserResizeRows="False"
+                  LoadingRow="MarkUpDataGrid_LoadingRow">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Row #" Binding="{Binding RowNumber}" Width="60" IsReadOnly="True">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="Foreground" Value="#1976D2"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="Cost Price (R)" Binding="{Binding CostPrice, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}" Width="*">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Right"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="Padding" Value="5"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                    <DataGridTextColumn.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsCostPriceCalculated}" Value="True">
+                                    <Setter Property="Background" Value="#E8F5E9"/>
+                                    <Setter Property="BorderBrush" Value="#66BB6A"/>
+                                    <Setter Property="BorderThickness" Value="1"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="Mark Up %" Binding="{Binding MarkUpPercent, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}" Width="*">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Right"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="Padding" Value="5"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                    <DataGridTextColumn.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsMarkUpPercentCalculated}" Value="True">
+                                    <Setter Property="Background" Value="#E8F5E9"/>
+                                    <Setter Property="BorderBrush" Value="#66BB6A"/>
+                                    <Setter Property="BorderThickness" Value="1"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
+
+                <DataGridComboBoxColumn Header="Mark Up Basis" 
+                                        SelectedItemBinding="{Binding MarkUpBasis, UpdateSourceTrigger=PropertyChanged}" 
+                                        Width="*">
+                    <DataGridComboBoxColumn.ElementStyle>
+                        <Style TargetType="ComboBox">
+                            <Setter Property="ItemsSource">
+                                <Setter.Value>
+                                    <x:Array Type="sys:String" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+                                        <sys:String>On Cost Price</sys:String>
+                                        <sys:String>On Selling Price</sys:String>
+                                    </x:Array>
+                                </Setter.Value>
+                            </Setter>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsMarkUpBasisCalculated}" Value="True">
+                                    <Setter Property="Background" Value="#E8F5E9"/>
+                                    <Setter Property="BorderBrush" Value="#66BB6A"/>
+                                    <Setter Property="BorderThickness" Value="1"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridComboBoxColumn.ElementStyle>
+                    <DataGridComboBoxColumn.EditingElementStyle>
+                        <Style TargetType="ComboBox">
+                            <Setter Property="ItemsSource">
+                                <Setter.Value>
+                                    <x:Array Type="sys:String" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+                                        <sys:String>On Cost Price</sys:String>
+                                        <sys:String>On Selling Price</sys:String>
+                                    </x:Array>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGridComboBoxColumn.EditingElementStyle>
+                </DataGridComboBoxColumn>
+
+                <DataGridTextColumn Header="Selling Price (R) ex VAT" Binding="{Binding SellingPrice, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}" Width="*">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Right"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="Padding" Value="5"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                    <DataGridTextColumn.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSellingPriceCalculated}" Value="True">
+                                    <Setter Property="Background" Value="#E8F5E9"/>
+                                    <Setter Property="BorderBrush" Value="#66BB6A"/>
+                                    <Setter Property="BorderThickness" Value="1"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="VAT 15% (R)" Binding="{Binding VATAmount, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}" Width="*">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Right"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="Padding" Value="5"/>
+                            <Setter Property="Foreground" Value="#F57C00"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                    <DataGridTextColumn.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsVATAmountCalculated}" Value="True">
+                                    <Setter Property="Background" Value="#E8F5E9"/>
+                                    <Setter Property="BorderBrush" Value="#66BB6A"/>
+                                    <Setter Property="BorderThickness" Value="1"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="Marked Price (R) inc VAT" Binding="{Binding MarkedPrice, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}" Width="*">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Right"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="Padding" Value="5"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="Foreground" Value="#388E3C"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                    <DataGridTextColumn.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsMarkedPriceCalculated}" Value="True">
+                                    <Setter Property="Background" Value="#E8F5E9"/>
+                                    <Setter Property="BorderBrush" Value="#66BB6A"/>
+                                    <Setter Property="BorderThickness" Value="1"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Info Panel -->
+        <Border Grid.Row="3" BorderBrush="#DDD" BorderThickness="1" Padding="15" Margin="0,15,0,0" Background="#F9F9F9">
+            <StackPanel>
+                <TextBlock Text="💡 How to use:" FontSize="14" FontWeight="Bold" Margin="0,0,0,10"/>
+                <TextBlock TextWrapping="Wrap" Margin="0,0,0,5">
+                    <Run Text="1. Click "/>
+                    <Run Text="Add Row" FontWeight="Bold"/>
+                    <Run Text=" to create a new calculation row"/>
+                </TextBlock>
+                <TextBlock TextWrapping="Wrap" Margin="0,0,0,5">
+                    <Run Text="2. Enter any "/>
+                    <Run Text="combination of values" FontWeight="Bold"/>
+                    <Run Text=" (Cost Price, Mark Up %, Mark Up Basis, Selling Price, VAT Amount, or Marked Price)"/>
+                </TextBlock>
+                <TextBlock TextWrapping="Wrap" Margin="0,0,0,5">
+                    <Run Text="3. Select the "/>
+                    <Run Text="Mark Up Basis" FontWeight="Bold"/>
+                    <Run Text=" if known (the system can calculate it if you provide enough data)"/>
+                </TextBlock>
+                <TextBlock TextWrapping="Wrap" Margin="0,0,0,5">
+                    <Run Text="4. Click "/>
+                    <Run Text="Calculate" FontWeight="Bold"/>
+                    <Run Text=" to compute the missing fields automatically"/>
+                </TextBlock>
+                <TextBlock TextWrapping="Wrap" Margin="0,0,0,5" Foreground="#555" FontStyle="Italic">
+                    <Run Text="Note: Calculated fields are highlighted in "/>
+                    <Run Text="green" FontWeight="Bold" Foreground="#66BB6A"/>
+                    <Run Text=". The system can determine the markup basis if you provide Cost Price, Selling Price, and Mark Up %."/>
+                </TextBlock>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

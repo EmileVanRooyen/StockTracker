@@ -83,6 +83,9 @@
             <TabItem Header="EOQ Calculation">
                 <views:EOQCalculator/>
             </TabItem>
+            <TabItem Header="Mark-up Calculation">
+                <views:MarkUpCalculation/>
+            </TabItem>
 
             <!-- Add more tabs here as needed -->
         </TabControl>
