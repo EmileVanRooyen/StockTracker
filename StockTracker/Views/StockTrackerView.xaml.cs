@@ -1,4 +1,7 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -87,7 +90,7 @@ namespace StockTracker.Views
 			var batch = new StockBatch(batchIdCounter++, units, price, date, "Opening Balance");
 			stockBatches.Add(batch);
 
-			AddTransaction(date, units, price, 0, null, "Opening Balance");
+			AddTransaction(date, units, price, 0, null, "Opening Balance", null);
 
 			txtOpeningUnits.Clear();
 			txtOpeningPrice.Clear();
@@ -119,7 +122,7 @@ namespace StockTracker.Views
 			var batch = new StockBatch(batchIdCounter++, units, price, date, "Purchase");
 			stockBatches.Add(batch);
 
-			AddTransaction(date, units, price, 0, null, $"Purchase - Batch #{batch.BatchId}");
+			AddTransaction(date, units, price, 0, null, $"Purchase - Batch #{batch.BatchId}", null);
 
 			txtPurchaseUnits.Clear();
 			txtPurchasePrice.Clear();
@@ -158,7 +161,12 @@ namespace StockTracker.Views
 
 			selectedBatch.Units -= unitsToReturn;
 
-			AddTransaction(date, 0, null, unitsToReturn, selectedBatch.PricePerUnit, $"Return - Batch #{selectedBatch.BatchId}");
+			var batchBreakdown = new List<BatchAllocation>
+			{
+				new BatchAllocation(selectedBatch.BatchId, unitsToReturn, selectedBatch.PricePerUnit)
+			};
+
+			AddTransaction(date, 0, null, unitsToReturn, selectedBatch.PricePerUnit, $"Return - Batch #{selectedBatch.BatchId}", batchBreakdown);
 
 			txtReturnUnits.Clear();
 			UpdateSummary();
@@ -206,6 +214,7 @@ namespace StockTracker.Views
 			decimal remainingToSell = unitsToSell;
 			decimal totalCost = 0;
 			var batchesUsed = new List<string>();
+			var batchBreakdown = new List<BatchAllocation>();
 
 			// FIFO - Process batches in order
 			foreach (var batch in stockBatches.Where(b => b.Units > 0).OrderBy(b => b.BatchId))
@@ -217,6 +226,7 @@ namespace StockTracker.Views
 					// Sell entire batch
 					totalCost += batch.Units * batch.PricePerUnit;
 					batchesUsed.Add($"#{batch.BatchId}");
+					batchBreakdown.Add(new BatchAllocation(batch.BatchId, batch.Units, batch.PricePerUnit));
 					remainingToSell -= batch.Units;
 					batch.Units = 0;
 				}
@@ -225,6 +235,7 @@ namespace StockTracker.Views
 					// Partial sale from batch
 					totalCost += remainingToSell * batch.PricePerUnit;
 					batchesUsed.Add($"#{batch.BatchId}");
+					batchBreakdown.Add(new BatchAllocation(batch.BatchId, remainingToSell, batch.PricePerUnit));
 					batch.Units -= remainingToSell;
 					remainingToSell = 0;
 				}
@@ -235,7 +246,7 @@ namespace StockTracker.Views
 				$"Sale - Batches: {string.Join(", ", batchesUsed)}" :
 				$"Issue - Batches: {string.Join(", ", batchesUsed)}";
 
-			AddTransaction(date, 0, null, unitsToSell, sellingPrice ?? averageCost, transactionType);
+			AddTransaction(date, 0, null, unitsToSell, sellingPrice ?? averageCost, transactionType, batchBreakdown);
 
 			txtSellUnits.Clear();
 			txtSellingPrice.Clear();
@@ -256,11 +267,40 @@ namespace StockTracker.Views
 		}
 
 		private void AddTransaction(DateTime date, decimal receivedUnits, decimal? receivedPrice,
-			decimal issuedUnits, decimal? issuedPrice, string transactionType)
+			decimal issuedUnits, decimal? issuedPrice, string transactionType, List<BatchAllocation> batchBreakdown)
 		{
 			decimal totalUnits = stockBatches.Sum(b => b.Units);
 			decimal totalValue = stockBatches.Sum(b => b.Units * b.PricePerUnit);
 			decimal averagePrice = totalUnits > 0 ? totalValue / totalUnits : 0;
+
+			// Format issued price to show batch breakdown
+			string issuedPriceDisplay = "";
+			string issuedUnitsDisplay = "";
+
+			if (issuedUnits > 0)
+			{
+				issuedUnitsDisplay = issuedUnits.ToString("N2");
+
+				if (batchBreakdown != null && batchBreakdown.Count > 0)
+				{
+					if (batchBreakdown.Count == 1)
+					{
+						// Single batch - show simple price
+						issuedPriceDisplay = $"R{batchBreakdown[0].PricePerUnit:N2}";
+					}
+					else
+					{
+						// Multiple batches - show detailed breakdown
+						var breakdownParts = batchBreakdown.Select(b =>
+							$"{b.Units:N2} @ R{b.PricePerUnit:N2}");
+						issuedPriceDisplay = string.Join("; ", breakdownParts);
+					}
+				}
+				else if (issuedPrice.HasValue)
+				{
+					issuedPriceDisplay = $"R{issuedPrice.Value:N2}";
+				}
+			}
 
 			var transaction = new TransactionRow
 			{
@@ -268,9 +308,11 @@ namespace StockTracker.Views
 				ReceivedUnits = receivedUnits > 0 ? receivedUnits.ToString("N2") : "",
 				ReceivedPrice = receivedPrice.HasValue ? $"R{receivedPrice.Value:N2}" : "",
 				ReceivedAmount = receivedUnits > 0 && receivedPrice.HasValue ? $"R{(receivedUnits * receivedPrice.Value):N2}" : "",
-				IssuedUnits = issuedUnits > 0 ? issuedUnits.ToString("N2") : "",
-				IssuedPrice = issuedPrice.HasValue ? $"R{issuedPrice.Value:N2}" : "",
-				IssuedAmount = issuedUnits > 0 && issuedPrice.HasValue ? $"R{(issuedUnits * issuedPrice.Value):N2}" : "",
+				IssuedUnits = issuedUnitsDisplay,
+				IssuedPrice = issuedPriceDisplay,
+				IssuedAmount = issuedUnits > 0 && batchBreakdown != null && batchBreakdown.Count > 0 ?
+					$"R{batchBreakdown.Sum(b => b.Units * b.PricePerUnit):N2}" :
+					(issuedUnits > 0 && issuedPrice.HasValue ? $"R{(issuedUnits * issuedPrice.Value):N2}" : ""),
 				BalanceUnits = totalUnits.ToString("N2"),
 				BalancePrice = $"R{averagePrice:N2}",
 				BalanceAmount = $"R{totalValue:N2}",
@@ -290,6 +332,20 @@ namespace StockTracker.Views
 			txtCurrentUnits.Text = $"Total Units: {totalUnits:N2}";
 			txtAverageCost.Text = $"Average Cost: R{averageCost:N2}";
 			txtTotalBatches.Text = $"Active Batches: {activeBatches}";
+		}
+
+		private class BatchAllocation
+		{
+			public int BatchId { get; }
+			public decimal Units { get; }
+			public decimal PricePerUnit { get; }
+
+			public BatchAllocation(int batchId, decimal units, decimal pricePerUnit)
+			{
+				BatchId = batchId;
+				Units = units;
+				PricePerUnit = pricePerUnit;
+			}
 		}
 
 		private class StockBatch

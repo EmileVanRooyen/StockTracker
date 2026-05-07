@@ -61,23 +61,23 @@
             </TabControl.Resources>
 
             <!-- Stock Tracker Tab -->
-            <TabItem Header="📊 Stock Tracker">
+            <TabItem Header="Inventory Valuation">
                 <views:StockTrackerView/>
             </TabItem>
 
             <!-- Contribution Calculation Tab -->
-            <TabItem Header="💰 Contribution Calculation">
+            <TabItem Header="Mixed Cost Analysis">
                 <views:ContributionCalculation/>
             </TabItem>
 
             <!-- Lead Time Contribution Analysis Tab -->
-            <TabItem Header="📈 Lead Time Analysis">
+            <TabItem Header="Lead Time, Usage, Safety Stock, Reorder Point">
                 <views:LeadTimeContributionAnalysis/>
             </TabItem>
             <TabItem Header="VAT Calculation">
                 <views:VATCalculation/>
             </TabItem>
-            <TabItem Header="Labour Calculation">
+            <TabItem Header="Sales and Direct Labour Budget">
                 <views:LabourCalculation/>
             </TabItem>
             <TabItem Header="EOQ Calculation">
@@ -85,6 +85,9 @@
             </TabItem>
             <TabItem Header="Mark-up Calculation">
                 <views:MarkUpCalculation/>
+            </TabItem>
+            <TabItem Header="Fixed Cost Portion Calculation">
+                <views:FixedCostPortionCalculator/>
             </TabItem>
 
             <!-- Add more tabs here as needed -->
